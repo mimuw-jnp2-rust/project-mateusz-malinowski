@@ -1,9 +1,12 @@
 #![allow(unused)] // todo: to remove
 
+mod player;
+
 use std::mem;
 // use std::default::Default;
 use bevy::prelude::*;
 use crate::CursorIcon::Default;
+use crate::player::PlayerPlugin;
 // use crate::CursorIcon::Default;
 
 // Asset Constants
@@ -45,8 +48,8 @@ fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
+        .add_plugin(PlayerPlugin)
         .add_startup_system(setup_system)
-        .add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
         .run();
 }
 
@@ -78,22 +81,4 @@ fn setup_system(
             explosion: asset_server.load(EXPLOSION_SHEET),
         }
     )
-}
-
-fn player_spawn_system(
-    mut commands: Commands,
-    game_textures: Res<GameTextures>,
-    mut window_size: ResMut<WindowSize>
-) {
-    let bottom = -window_size.h / 2.;
-
-    commands.spawn_bundle(SpriteBundle {
-        texture: game_textures.player.clone(),
-        transform: Transform {
-            translation: Vec3::new(0., bottom + PLAYER_SIZE.1 * SPRITE_SCALE / 2., 10.),
-            scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
-            ..default()
-        },
-        ..default()
-    });
 }
