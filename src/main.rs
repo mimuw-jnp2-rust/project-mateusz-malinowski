@@ -2,10 +2,12 @@
 
 mod components;
 mod player;
+mod enemy;
 
 use bevy::prelude::*;
 
 use crate::components::{Movable, Velocity};
+use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
 
 // Asset Constants
@@ -52,6 +54,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(PlayerPlugin)
+        .add_plugin(EnemyPlugin)
         .add_startup_system(setup_system)
         .add_system(movable_system)
         .run();
