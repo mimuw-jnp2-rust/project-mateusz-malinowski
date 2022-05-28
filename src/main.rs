@@ -1,5 +1,6 @@
 #![allow(unused)] // todo: to remove
 
+mod components;
 mod player;
 
 use std::mem;
@@ -24,6 +25,10 @@ const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const EXPLOSION_LEN: usize = 16;
 
 const SPRITE_SCALE: f32 = 0.5;
+
+// Game Constants
+const TIME_STEP: f32 = 1. / 60.;
+const BASE_SPEED: f32 = 500.;
 
 // Resources
 
