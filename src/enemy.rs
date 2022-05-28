@@ -1,13 +1,15 @@
 use bevy::prelude::*;
 use rand::{Rng, thread_rng};
-use crate::{ENEMY_SIZE, ENEMY_SPRITE, EnemyCount, GameTextures, SPRITE_SCALE, SpriteSize, Wave, WindowSize};
+use crate::{ENEMY_SIZE, ENEMY_SPRITE, EnemyCount, GameTextures, Movable, Rotated, SPRITE_SCALE, SpriteSize, TIME_STEP, Velocity, Wave, WindowSize};
 use crate::components::Enemy;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(enemy_spawn_system);
+        app
+            .add_system(enemy_spawn_system)
+            .add_system(enemy_movement_system);
     }
 }
 
@@ -19,7 +21,7 @@ fn enemy_spawn_system(
     wave: Res<Wave>
 ) {
     // compute the random position
-    const MARGIN: f32 = 100.;
+    const MARGIN: f32 = 200.;
     let mut rng = thread_rng();
     let w_span = win_size.w / 2. - MARGIN;
     let h_span = win_size.h / 2. - MARGIN;
@@ -40,10 +42,39 @@ fn enemy_spawn_system(
                     ..default()
                 })
                 .insert(Enemy)
-                .insert(SpriteSize::from(ENEMY_SIZE));
+                .insert(SpriteSize::from(ENEMY_SIZE))
+                .insert(Movable { auto_despawn: false })
+                .insert(Velocity {
+                    x: rng.gen_range(-0.3..0.3) as f32,
+                    y: rng.gen_range(-0.3..0.3) as f32
+                });
         }
 
         enemy_count.0 = wave.0;
     }
+}
 
+fn enemy_movement_system(
+    time: Res<Time>,
+    mut rotated: ResMut<Rotated>,
+    mut query: Query<&mut Velocity, With<Enemy>>
+) {
+    let now = (time.seconds_since_startup() as f32 * 2.) as i32;
+
+    if now % 2 == 0 {
+        if !rotated.0 {
+            if now % 4 != 0 {
+                for mut velocity in query.iter_mut() {
+                    velocity.x *= -1.;
+                }
+            } else {
+                for mut velocity in query.iter_mut() {
+                    velocity.y *= -1.;
+                }
+            }
+            rotated.0 = true;
+        }
+    } else {
+        rotated.0 = false;
+    }
 }

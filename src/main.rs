@@ -51,6 +51,8 @@ struct Wave(u32);
 
 struct EnemyCount(u32);
 
+struct Rotated(bool);
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
@@ -98,6 +100,7 @@ fn setup_system(
 
     commands.insert_resource(Wave(1));
     commands.insert_resource(EnemyCount(0));
+    commands.insert_resource(Rotated(false));
 }
 
 fn movable_system(
