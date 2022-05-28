@@ -9,7 +9,7 @@ use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 use bevy::math::Vec3Swizzles;
 
-use crate::components::{Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, SpriteSize, Velocity};
+use crate::components::{Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity};
 use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
 
@@ -53,6 +53,8 @@ struct EnemyCount(u32);
 
 struct Rotated(bool);
 
+struct Score(u32);
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
@@ -66,6 +68,7 @@ fn main() {
         .add_startup_system(setup_system)
         .add_system(movable_system)
         .add_system(player_laser_hit_enemy_system)
+        .add_system(score_update_system)
         .run();
 }
 
@@ -74,8 +77,9 @@ fn setup_system(
     asset_server: Res<AssetServer>,
     mut windows: ResMut<Windows>
 ) {
-    // Camera
+    // Cameras
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(UiCameraBundle::default());
 
     // Window Size
     let window = windows.get_primary_mut().unwrap();
@@ -101,6 +105,53 @@ fn setup_system(
     commands.insert_resource(Wave(1));
     commands.insert_resource(EnemyCount(0));
     commands.insert_resource(Rotated(false));
+    commands.insert_resource(Score(0));
+
+    // Points counter
+    commands
+        .spawn_bundle(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                justify_content: JustifyContent::SpaceBetween,
+                ..default()
+            },
+            color: Color::NONE.into(),
+            ..default()
+        })
+        .with_children(|parent| {
+            parent.spawn_bundle(TextBundle {
+                style: Style {
+                    align_self: AlignSelf::FlexEnd,
+                    position_type: PositionType::Absolute,
+                    position: Rect {
+                        top: Val::Px(15.0),
+                        right: Val::Px(15.0),
+                        ..default()
+                    },
+                    margin: Rect::all(Val::Px(5.0)),
+                    ..default()
+                },
+                text: Text::with_section(
+                    "0",
+                    TextStyle {
+                        font: asset_server.load("fonts/LED Dot-Matrix.ttf"),
+                        font_size: 40.0,
+                        color: Color::WHITE,
+                    }, Default::default()
+                ),
+                ..default()
+            })
+                .insert(ScoreText);
+        });
+}
+
+fn score_update_system(
+    mut query: Query<&mut Text, With<ScoreText>>,
+    score: Res<Score>
+) {
+    if let Ok(mut text) = query.get_single_mut() {
+        text.sections[0].value = score.0.to_string();
+    }
 }
 
 fn movable_system(
@@ -134,6 +185,7 @@ fn player_laser_hit_enemy_system(
     enemy_query: Query<(Entity, &Transform, &SpriteSize), With<Enemy>>,
     mut enemy_count: ResMut<EnemyCount>,
     mut wave: ResMut<Wave>,
+    mut score: ResMut<Score>,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
 
@@ -169,6 +221,8 @@ fn player_laser_hit_enemy_system(
                 commands.entity(enemy_entity).despawn();
                 despawned_entities.insert(enemy_entity);
                 enemy_count.0 -= 1;
+
+                score.0 += 100;
 
                 // start next wave
                 if enemy_count.0 == 0 {

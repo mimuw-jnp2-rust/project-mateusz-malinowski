@@ -34,3 +34,6 @@ pub struct Enemy;
 
 #[derive(Component)]
 pub struct FromEnemy;
+
+#[derive(Component)]
+pub struct ScoreText;

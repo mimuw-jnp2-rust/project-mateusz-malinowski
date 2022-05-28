@@ -22,6 +22,8 @@ fn enemy_spawn_system(
 ) {
     // compute the random position
     const MARGIN: f32 = 200.;
+    const MARGIN_BOTTOM: f32 = 80.;
+
     let mut rng = thread_rng();
     let w_span = win_size.w / 2. - MARGIN;
     let h_span = win_size.h / 2. - MARGIN;
@@ -29,7 +31,7 @@ fn enemy_spawn_system(
     if enemy_count.0 == 0 {
         for _ in 0..wave.0 {
             let x = rng.gen_range(-w_span..w_span) as f32;
-            let y = rng.gen_range(-h_span..h_span) as f32;
+            let y = rng.gen_range((-h_span + MARGIN_BOTTOM)..h_span) as f32;
 
             commands
                 .spawn_bundle( SpriteBundle {
