@@ -1,9 +1,6 @@
-use crate::components::{
-    ContinueButton, ExitButton, MainMenuButton, NewGameButton, PauseMenu, SaveButton,
-};
+use crate::components::{ContinueButton, MainMenuButton, PauseMenu, SaveButton};
 use crate::ui::buttons::{hide, make_button, make_text, show, ButtonsPlugin};
 use crate::{AppState, Fonts};
-use bevy::app::AppExit;
 use bevy::prelude::*;
 
 pub struct PauseMenuPlugin;
@@ -24,10 +21,10 @@ impl Plugin for PauseMenuPlugin {
 }
 
 fn continue_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<ContinueButton>)>,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<ContinueButton>)>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    for (interaction) in interaction_query.iter() {
+    for interaction in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::InGame).unwrap();
         }
@@ -35,10 +32,10 @@ fn continue_button_system(
 }
 
 fn save_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<SaveButton>)>,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<SaveButton>)>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    for (interaction) in interaction_query.iter() {
+    for interaction in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::Save).unwrap();
         }
@@ -46,21 +43,17 @@ fn save_button_system(
 }
 
 fn main_menu_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<MainMenuButton>)>,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<MainMenuButton>)>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    for (interaction) in interaction_query.iter() {
+    for interaction in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::MainMenu).unwrap();
         }
     }
 }
 
-fn button_display_system(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    fonts: Res<Fonts>,
-) {
+fn button_display_system(mut commands: Commands, fonts: Res<Fonts>) {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {

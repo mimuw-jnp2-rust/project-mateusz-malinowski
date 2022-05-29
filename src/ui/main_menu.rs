@@ -22,10 +22,10 @@ impl Plugin for MainMenuPlugin {
 }
 
 fn new_game_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<NewGameButton>)>,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<NewGameButton>)>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    for (interaction) in interaction_query.iter() {
+    for interaction in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::InitNewGame).unwrap();
         }
@@ -33,10 +33,10 @@ fn new_game_button_system(
 }
 
 fn load_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<LoadButton>)>,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<LoadButton>)>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    for (interaction) in interaction_query.iter() {
+    for interaction in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::Load).unwrap();
         }
@@ -44,21 +44,17 @@ fn load_button_system(
 }
 
 fn exit_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<ExitButton>)>,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<ExitButton>)>,
     mut exit: EventWriter<AppExit>,
 ) {
-    for (interaction) in interaction_query.iter() {
+    for interaction in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             exit.send(AppExit);
         }
     }
 }
 
-fn button_display_system(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    fonts: Res<Fonts>,
-) {
+fn button_display_system(mut commands: Commands, fonts: Res<Fonts>) {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {

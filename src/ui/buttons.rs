@@ -67,13 +67,13 @@ pub fn make_text(text: &str, fonts: &Res<Fonts>) -> TextBundle {
     }
 }
 
-pub fn show<T: Component>(mut commands: Commands, mut query: Query<&mut Style, With<T>>) {
+pub fn show<T: Component>(mut query: Query<&mut Style, With<T>>) {
     for mut style in query.iter_mut() {
         style.display = Display::Flex;
     }
 }
 
-pub fn hide<T: Component>(mut commands: Commands, mut query: Query<&mut Style, With<T>>) {
+pub fn hide<T: Component>(mut query: Query<&mut Style, With<T>>) {
     for mut style in query.iter_mut() {
         style.display = Display::None;
     }

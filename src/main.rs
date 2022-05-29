@@ -1,4 +1,4 @@
-#![allow(unused)] // todo: to remove
+#![allow(clippy::type_complexity)]
 
 mod components;
 mod enemy;
@@ -35,6 +35,9 @@ const ENEMY_LASER_SPRITE: &str = "laser_b_01.png";
 const ENEMY_LASER_SIZE: (f32, f32) = (17., 55.);
 
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
+
+// this will be used later
+#[allow(dead_code)]
 const EXPLOSION_LEN: usize = 16;
 
 const SPRITE_SCALE: f32 = 0.5;
@@ -53,6 +56,8 @@ pub struct WindowSize {
     pub h: f32,
 }
 
+// field explosion will be used later
+#[allow(dead_code)]
 struct GameTextures {
     player: Handle<Image>,
     player_laser: Handle<Image>,
@@ -201,7 +206,7 @@ fn player_laser_hit_enemy_system(
             continue;
         }
 
-        let laser_scale = Vec2::from(laser_tf.scale.xy());
+        let laser_scale = laser_tf.scale.xy();
 
         // iterate through the enemies
         for (enemy_entity, enemy_tf, enemy_size) in enemy_query.iter() {
@@ -211,7 +216,7 @@ fn player_laser_hit_enemy_system(
                 continue;
             }
 
-            let enemy_scale = Vec2::from(enemy_tf.scale.xy());
+            let enemy_scale = enemy_tf.scale.xy();
 
             // determine if collision
             let collision = collide(
@@ -247,14 +252,14 @@ fn enemy_laser_hit_player_system(
     mut commands: Commands,
     mut lives: ResMut<Lives>,
     laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromEnemy>)>,
-    player_query: Query<(Entity, &Transform, &SpriteSize), With<Player>>,
+    player_query: Query<(&Transform, &SpriteSize), With<Player>>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    if let Ok((player_entity, player_tf, player_size)) = player_query.get_single() {
-        let player_scale = Vec2::from(player_tf.scale.xy());
+    if let Ok((player_tf, player_size)) = player_query.get_single() {
+        let player_scale = player_tf.scale.xy();
 
         for (laser_entity, laser_tf, laser_size) in laser_query.iter() {
-            let laser_scale = Vec2::from(laser_tf.scale.xy());
+            let laser_scale = laser_tf.scale.xy();
 
             // determine if collision
             let collision = collide(

@@ -1,7 +1,6 @@
 use crate::components::{FromPlayer, Movable, Player, SpriteSize, Velocity};
 use crate::{
-    AppState, GameTextures, Laser, WindowSize, BASE_SPEED, PLAYER_LASER_SIZE, PLAYER_SIZE,
-    SPRITE_SCALE, TIME_STEP,
+    AppState, GameTextures, Laser, WindowSize, PLAYER_LASER_SIZE, PLAYER_SIZE, SPRITE_SCALE,
 };
 use bevy::prelude::*;
 
@@ -21,7 +20,7 @@ impl Plugin for PlayerPlugin {
 fn player_spawn_system(
     mut commands: Commands,
     game_textures: Res<GameTextures>,
-    mut window_size: ResMut<WindowSize>,
+    window_size: ResMut<WindowSize>,
 ) {
     let bottom = -window_size.h / 2.;
 

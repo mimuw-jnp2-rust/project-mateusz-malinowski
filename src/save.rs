@@ -1,6 +1,5 @@
-use crate::{AppState, EnemyCount, Lives, Score, Wave};
+use crate::{AppState, Lives, Score, Wave};
 use bevy::prelude::*;
-use std::fmt::format;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -15,9 +14,9 @@ impl Plugin for SavePlugin {
 }
 
 fn save_system(
-    mut wave: ResMut<Wave>,
-    mut score: ResMut<Score>,
-    mut lives: ResMut<Lives>,
+    wave: ResMut<Wave>,
+    score: ResMut<Score>,
+    lives: ResMut<Lives>,
     mut app_state: ResMut<State<AppState>>,
 ) {
     let text = format!("{}\n{}\n{}\n", wave.0, score.0, lives.0);
@@ -35,7 +34,7 @@ fn save_system(
         }
     }
 
-    let mut f = File::create("saves/save.txt");
+    let f = File::create("saves/save.txt");
 
     match f {
         Ok(mut file) => {

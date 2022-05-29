@@ -1,10 +1,8 @@
 use crate::{AppState, EnemyCount, Lives, Score, Wave};
 use bevy::prelude::*;
-use std::fmt::format;
 use std::fs::File;
-use std::io::{BufRead, Write};
-use std::path::Path;
-use std::{fs, io};
+use std::io;
+use std::io::BufRead;
 
 pub struct LoadPlugin;
 
@@ -21,10 +19,10 @@ fn load_system(
     mut lives: ResMut<Lives>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    let mut f = File::open("saves/save.txt");
+    let f = File::open("saves/save.txt");
 
     match f {
-        Ok(mut file) => {
+        Ok(file) => {
             let lines: Vec<io::Result<String>> = io::BufReader::new(file).lines().collect();
             wave.0 = lines[0].as_ref().unwrap().parse().unwrap();
             score.0 = lines[1].as_ref().unwrap().parse().unwrap();
@@ -37,6 +35,7 @@ fn load_system(
 
             // return to main menu
             app_state.set(AppState::MainMenu).unwrap();
+            return;
         }
     }
 

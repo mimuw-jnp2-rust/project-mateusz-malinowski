@@ -1,7 +1,7 @@
 use crate::components::Enemy;
 use crate::{
     AppState, EnemyCount, FromEnemy, GameTextures, Laser, Movable, Rotated, SpriteSize, Velocity,
-    Wave, WindowSize, ENEMY_LASER_SIZE, ENEMY_SIZE, ENEMY_SPRITE, SPRITE_SCALE, TIME_STEP,
+    Wave, WindowSize, ENEMY_LASER_SIZE, ENEMY_SIZE, SPRITE_SCALE,
 };
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
@@ -123,7 +123,6 @@ fn enemy_fire_system(
                     translation: Vec3::new(x, y - 15., 0.),
                     rotation: Quat::from_rotation_x(PI),
                     scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
-                    ..Default::default()
                 },
                 ..Default::default()
             })
