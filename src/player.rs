@@ -39,7 +39,8 @@ fn player_spawn_system(
         .insert(Movable {
             auto_despawn: false,
         })
-        .insert(Velocity { x: 0., y: 0. });
+        .insert(Velocity { x: 0., y: 0. })
+        .insert(SpriteSize::from(PLAYER_SIZE));
 }
 
 fn player_fire_system(

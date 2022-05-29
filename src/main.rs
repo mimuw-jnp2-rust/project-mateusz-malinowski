@@ -70,6 +70,8 @@ struct Rotated(bool);
 
 struct Score(u32);
 
+struct Lives(u32);
+
 // States
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum AppState {
@@ -98,6 +100,7 @@ fn main() {
             SystemSet::on_update(AppState::InGame)
                 .with_system(movable_system)
                 .with_system(player_laser_hit_enemy_system)
+                .with_system(enemy_laser_hit_player_system)
                 .with_system(pause_keyboard_event_system),
         )
         .add_system_set(
@@ -146,6 +149,7 @@ fn setup_system(
     commands.insert_resource(EnemyCount(0));
     commands.insert_resource(Rotated(false));
     commands.insert_resource(Score(0));
+    commands.insert_resource(Lives(3));
 }
 
 fn movable_system(
@@ -231,6 +235,45 @@ fn player_laser_hit_enemy_system(
     }
 }
 
+fn enemy_laser_hit_player_system(
+    mut commands: Commands,
+    mut lives: ResMut<Lives>,
+    laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromEnemy>)>,
+    player_query: Query<(Entity, &Transform, &SpriteSize), With<Player>>,
+    mut app_state: ResMut<State<AppState>>,
+) {
+    if let Ok((player_entity, player_tf, player_size)) = player_query.get_single() {
+        let player_scale = Vec2::from(player_tf.scale.xy());
+
+        for (laser_entity, laser_tf, laser_size) in laser_query.iter() {
+            let laser_scale = Vec2::from(laser_tf.scale.xy());
+
+            // determine if collision
+            let collision = collide(
+                laser_tf.translation,
+                laser_size.0 * laser_scale,
+                player_tf.translation,
+                player_size.0 * player_scale,
+            );
+
+            // perform the collision
+            if collision.is_some() {
+                // remove the laser
+                commands.entity(laser_entity).despawn();
+
+                lives.0 -= 1;
+
+                if lives.0 == 0 {
+                    // return to main menu
+                    app_state.set(AppState::MainMenu);
+                }
+
+                break;
+            }
+        }
+    }
+}
+
 fn pause_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
     if kb.pressed(KeyCode::Escape) || kb.pressed(KeyCode::P) {
         app_state.set(AppState::Paused).unwrap();
@@ -260,11 +303,13 @@ fn new_game_init_system(
     mut wave: ResMut<Wave>,
     mut enemy_count: ResMut<EnemyCount>,
     mut score: ResMut<Score>,
+    mut lives: ResMut<Lives>,
     mut app_state: ResMut<State<AppState>>,
 ) {
     wave.0 = 1;
     enemy_count.0 = 0;
     score.0 = 0;
+    lives.0 = 3;
 
     app_state.set(AppState::InGame);
 }
