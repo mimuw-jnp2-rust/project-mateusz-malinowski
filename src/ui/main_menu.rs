@@ -1,12 +1,11 @@
-use bevy::prelude::*;
 use crate::Fonts;
+use bevy::prelude::*;
 
 pub struct MainMenuPlugin;
 
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_startup_system_to_stage(StartupStage::PostStartup, button_display_system)
+        app.add_startup_system_to_stage(StartupStage::PostStartup, button_display_system)
             .add_system(button_system);
     }
 }
@@ -36,7 +35,11 @@ fn button_system(
     }
 }
 
-fn button_display_system(mut commands: Commands, asset_server: Res<AssetServer>, fonts: Res<Fonts>) {
+fn button_display_system(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    fonts: Res<Fonts>,
+) {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -60,21 +63,15 @@ fn button_display_system(mut commands: Commands, asset_server: Res<AssetServer>,
                     ..default()
                 })
                 .with_children(|parent| {
-                    parent
-                        .spawn_bundle(make_button())
-                        .with_children(|parent| {
-                            parent.spawn_bundle(make_text("new game", &fonts));
-                        });
-                    parent
-                        .spawn_bundle(make_button())
-                        .with_children(|parent| {
-                            parent.spawn_bundle(make_text("load", &fonts));
-                        });
-                    parent
-                        .spawn_bundle(make_button())
-                        .with_children(|parent| {
-                            parent.spawn_bundle(make_text("exit", &fonts));
-                        });
+                    parent.spawn_bundle(make_button()).with_children(|parent| {
+                        parent.spawn_bundle(make_text("new game", &fonts));
+                    });
+                    parent.spawn_bundle(make_button()).with_children(|parent| {
+                        parent.spawn_bundle(make_text("load", &fonts));
+                    });
+                    parent.spawn_bundle(make_button()).with_children(|parent| {
+                        parent.spawn_bundle(make_text("exit", &fonts));
+                    });
                 });
         });
 }
@@ -98,15 +95,15 @@ fn make_button() -> ButtonBundle {
 
 fn make_text(text: &str, fonts: &Res<Fonts>) -> TextBundle {
     TextBundle {
-            text: Text::with_section(
-                text,
-                TextStyle {
-                    font: fonts.button.clone(),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
-                },
-                Default::default(),
-            ),
-            ..default()
-        }
+        text: Text::with_section(
+            text,
+            TextStyle {
+                font: fonts.button.clone(),
+                font_size: 40.0,
+                color: Color::rgb(0.9, 0.9, 0.9),
+            },
+            Default::default(),
+        ),
+        ..default()
+    }
 }

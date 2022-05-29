@@ -1,2 +1,2 @@
-pub mod score;
 pub mod main_menu;
+pub mod score;

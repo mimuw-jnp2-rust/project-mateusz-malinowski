@@ -1,19 +1,15 @@
-use bevy::prelude::*;
 use crate::{Fonts, ScoreText};
+use bevy::prelude::*;
 
 pub struct ScorePlugin;
 
 impl Plugin for ScorePlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_startup_system_to_stage(StartupStage::PostStartup, score_display_system);
+        app.add_startup_system_to_stage(StartupStage::PostStartup, score_display_system);
     }
 }
 
-fn score_display_system(
-    mut commands: Commands,
-    fonts: Res<Fonts>,
-) {
+fn score_display_system(mut commands: Commands, fonts: Res<Fonts>) {
     commands
         .spawn_bundle(TextBundle {
             style: Style {
@@ -33,7 +29,8 @@ fn score_display_system(
                     font: fonts.score.clone(),
                     font_size: 40.0,
                     color: Color::WHITE,
-                }, Default::default()
+                },
+                Default::default(),
             ),
             ..default()
         })

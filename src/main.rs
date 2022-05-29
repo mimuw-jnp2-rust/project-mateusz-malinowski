@@ -1,16 +1,18 @@
 #![allow(unused)] // todo: to remove
 
 mod components;
-mod player;
 mod enemy;
+mod player;
 mod ui;
 
-use std::collections::HashSet;
+use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
-use bevy::math::Vec3Swizzles;
+use std::collections::HashSet;
 
-use crate::components::{Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity};
+use crate::components::{
+    Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity,
+};
 use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
 use crate::ui::main_menu::MainMenuPlugin;
@@ -89,7 +91,7 @@ fn main() {
 fn setup_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut windows: ResMut<Windows>
+    mut windows: ResMut<Windows>,
 ) {
     // Cameras
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
@@ -98,31 +100,25 @@ fn setup_system(
     // Window Size
     let window = windows.get_primary_mut().unwrap();
 
-    commands.insert_resource(
-        WindowSize {
-            w: window.width(),
-            h: window.height()
-        }
-    );
+    commands.insert_resource(WindowSize {
+        w: window.width(),
+        h: window.height(),
+    });
 
     // Game Textures
-    commands.insert_resource(
-        GameTextures {
-            player: asset_server.load(PLAYER_SPRITE),
-            player_laser: asset_server.load(PLAYER_LASER_SPRITE),
-            enemy: asset_server.load(ENEMY_SPRITE),
-            enemy_laser: asset_server.load(ENEMY_LASER_SPRITE),
-            explosion: asset_server.load(EXPLOSION_SHEET),
-        }
-    );
+    commands.insert_resource(GameTextures {
+        player: asset_server.load(PLAYER_SPRITE),
+        player_laser: asset_server.load(PLAYER_LASER_SPRITE),
+        enemy: asset_server.load(ENEMY_SPRITE),
+        enemy_laser: asset_server.load(ENEMY_LASER_SPRITE),
+        explosion: asset_server.load(EXPLOSION_SHEET),
+    });
 
     // Fonts
-    commands.insert_resource(
-        Fonts {
-            score: asset_server.load(SCORE_FONT),
-            button: asset_server.load(BUTTON_FONT),
-        }
-    );
+    commands.insert_resource(Fonts {
+        score: asset_server.load(SCORE_FONT),
+        button: asset_server.load(BUTTON_FONT),
+    });
 
     commands.insert_resource(Wave(1));
     commands.insert_resource(EnemyCount(0));
@@ -130,10 +126,7 @@ fn setup_system(
     commands.insert_resource(Score(0));
 }
 
-fn score_update_system(
-    mut query: Query<&mut Text, With<ScoreText>>,
-    score: Res<Score>
-) {
+fn score_update_system(mut query: Query<&mut Text, With<ScoreText>>, score: Res<Score>) {
     if let Ok(mut text) = query.get_single_mut() {
         text.sections[0].value = score.0.to_string();
     }

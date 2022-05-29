@@ -1,13 +1,15 @@
-use bevy::prelude::*;
-use crate::{BASE_SPEED, GameTextures, Laser, PLAYER_LASER_SIZE, PLAYER_SIZE, SPRITE_SCALE, TIME_STEP, WindowSize};
 use crate::components::{FromPlayer, Movable, Player, SpriteSize, Velocity};
+use crate::{
+    GameTextures, Laser, WindowSize, BASE_SPEED, PLAYER_LASER_SIZE, PLAYER_SIZE, SPRITE_SCALE,
+    TIME_STEP,
+};
+use bevy::prelude::*;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
+        app.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
             .add_system(player_fire_system)
             .add_system(player_keyboard_event_system);
     }
@@ -16,7 +18,7 @@ impl Plugin for PlayerPlugin {
 fn player_spawn_system(
     mut commands: Commands,
     game_textures: Res<GameTextures>,
-    mut window_size: ResMut<WindowSize>
+    mut window_size: ResMut<WindowSize>,
 ) {
     let bottom = -window_size.h / 2.;
 
@@ -31,8 +33,10 @@ fn player_spawn_system(
             ..default()
         })
         .insert(Player)
-        .insert(Movable { auto_despawn: false })
-        .insert(Velocity {x: 0., y: 0.});
+        .insert(Movable {
+            auto_despawn: false,
+        })
+        .insert(Velocity { x: 0., y: 0. });
 }
 
 fn player_fire_system(

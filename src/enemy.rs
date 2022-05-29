@@ -1,14 +1,16 @@
-use bevy::prelude::*;
-use rand::{Rng, thread_rng};
-use crate::{ENEMY_SIZE, ENEMY_SPRITE, EnemyCount, GameTextures, Movable, Rotated, SPRITE_SCALE, SpriteSize, TIME_STEP, Velocity, Wave, WindowSize};
 use crate::components::Enemy;
+use crate::{
+    EnemyCount, GameTextures, Movable, Rotated, SpriteSize, Velocity, Wave, WindowSize, ENEMY_SIZE,
+    ENEMY_SPRITE, SPRITE_SCALE, TIME_STEP,
+};
+use bevy::prelude::*;
+use rand::{thread_rng, Rng};
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_system(enemy_spawn_system)
+        app.add_system(enemy_spawn_system)
             .add_system(enemy_movement_system);
     }
 }
@@ -18,7 +20,7 @@ fn enemy_spawn_system(
     game_textures: Res<GameTextures>,
     win_size: Res<WindowSize>,
     mut enemy_count: ResMut<EnemyCount>,
-    wave: Res<Wave>
+    wave: Res<Wave>,
 ) {
     // compute the random position
     const MARGIN: f32 = 200.;
@@ -34,7 +36,7 @@ fn enemy_spawn_system(
             let y = rng.gen_range((-h_span + MARGIN_BOTTOM)..h_span) as f32;
 
             commands
-                .spawn_bundle( SpriteBundle {
+                .spawn_bundle(SpriteBundle {
                     texture: game_textures.enemy.clone(),
                     transform: Transform {
                         translation: Vec3::new(x, y, 10.),
@@ -45,10 +47,12 @@ fn enemy_spawn_system(
                 })
                 .insert(Enemy)
                 .insert(SpriteSize::from(ENEMY_SIZE))
-                .insert(Movable { auto_despawn: false })
+                .insert(Movable {
+                    auto_despawn: false,
+                })
                 .insert(Velocity {
                     x: rng.gen_range(-0.3..0.3) as f32,
-                    y: rng.gen_range(-0.3..0.3) as f32
+                    y: rng.gen_range(-0.3..0.3) as f32,
                 });
         }
 
@@ -59,7 +63,7 @@ fn enemy_spawn_system(
 fn enemy_movement_system(
     time: Res<Time>,
     mut rotated: ResMut<Rotated>,
-    mut query: Query<&mut Velocity, With<Enemy>>
+    mut query: Query<&mut Velocity, With<Enemy>>,
 ) {
     let now = (time.seconds_since_startup() as f32 * 2.) as i32;
 
