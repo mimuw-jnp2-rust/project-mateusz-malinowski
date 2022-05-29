@@ -1,43 +1,43 @@
-use crate::components::{ExitButton, MainMenu, NewGameButton};
+use crate::components::{ContinueButton, ExitButton, MainMenuButton, NewGameButton, PauseMenu};
 use crate::ui::buttons::{hide, make_button, make_text, show, ButtonsPlugin};
 use crate::{AppState, Fonts};
 use bevy::app::AppExit;
 use bevy::prelude::*;
 
-pub struct MainMenuPlugin;
+pub struct PauseMenuPlugin;
 
-impl Plugin for MainMenuPlugin {
+impl Plugin for PauseMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system_to_stage(StartupStage::PostStartup, button_display_system)
             .add_plugin(ButtonsPlugin)
             .add_system_set(
-                SystemSet::on_update(AppState::MainMenu)
-                    .with_system(new_game_button_system)
-                    .with_system(exit_button_system),
+                SystemSet::on_update(AppState::Paused)
+                    .with_system(continue_button_system)
+                    .with_system(main_menu_button_system),
             )
-            .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(show::<MainMenu>))
-            .add_system_set(SystemSet::on_exit(AppState::MainMenu).with_system(hide::<MainMenu>));
+            .add_system_set(SystemSet::on_enter(AppState::Paused).with_system(show::<PauseMenu>))
+            .add_system_set(SystemSet::on_exit(AppState::Paused).with_system(hide::<PauseMenu>));
     }
 }
 
-fn new_game_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<NewGameButton>)>,
+fn continue_button_system(
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<ContinueButton>)>,
     mut app_state: ResMut<State<AppState>>,
 ) {
     for (interaction) in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
-            app_state.set(AppState::InitNewGame).unwrap();
+            app_state.set(AppState::InGame).unwrap();
         }
     }
 }
 
-fn exit_button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<ExitButton>)>,
-    mut exit: EventWriter<AppExit>,
+fn main_menu_button_system(
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<MainMenuButton>)>,
+    mut app_state: ResMut<State<AppState>>,
 ) {
     for (interaction) in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
-            exit.send(AppExit);
+            app_state.set(AppState::MainMenu).unwrap();
         }
     }
 }
@@ -53,9 +53,10 @@ fn button_display_system(
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
+                display: Display::None,
                 ..default()
             },
-            color: Color::rgb(0.06, 0.06, 0.06).into(),
+            color: Color::NONE.into(),
             ..default()
         })
         .with_children(|parent| {
@@ -73,21 +74,21 @@ fn button_display_system(
                     parent
                         .spawn_bundle(make_button())
                         .with_children(|parent| {
-                            parent.spawn_bundle(make_text("new game", &fonts));
+                            parent.spawn_bundle(make_text("continue", &fonts));
                         })
-                        .insert(NewGameButton);
+                        .insert(ContinueButton);
 
                     parent.spawn_bundle(make_button()).with_children(|parent| {
-                        parent.spawn_bundle(make_text("load game", &fonts));
+                        parent.spawn_bundle(make_text("save game", &fonts));
                     });
 
                     parent
                         .spawn_bundle(make_button())
                         .with_children(|parent| {
-                            parent.spawn_bundle(make_text("exit", &fonts));
+                            parent.spawn_bundle(make_text("main menu", &fonts));
                         })
-                        .insert(ExitButton);
+                        .insert(MainMenuButton);
                 });
         })
-        .insert(MainMenu);
+        .insert(PauseMenu);
 }

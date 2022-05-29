@@ -1,3 +1,4 @@
+use crate::ui::buttons::{hide, show};
 use crate::{AppState, Fonts, Score, ScoreText};
 use bevy::prelude::*;
 
@@ -6,9 +7,9 @@ pub struct ScorePlugin;
 impl Plugin for ScorePlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system_to_stage(StartupStage::PostStartup, score_display_system)
-            .add_system_set(
-                SystemSet::on_update(AppState::InGame).with_system(score_update_system),
-            );
+            .add_system_set(SystemSet::on_update(AppState::InGame).with_system(score_update_system))
+            .add_system_set(SystemSet::on_enter(AppState::InGame).with_system(show::<ScoreText>))
+            .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(hide::<ScoreText>));
     }
 }
 

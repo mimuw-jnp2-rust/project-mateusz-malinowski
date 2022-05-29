@@ -16,6 +16,7 @@ use crate::components::{
 use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
 use crate::ui::main_menu::MainMenuPlugin;
+use crate::ui::pause_menu::PauseMenuPlugin;
 use crate::ui::score::ScorePlugin;
 
 // Asset Constants
@@ -56,7 +57,7 @@ struct GameTextures {
     explosion: Handle<TextureAtlas>,
 }
 
-struct Fonts {
+pub struct Fonts {
     score: Handle<Font>,
     button: Handle<Font>,
 }
@@ -73,6 +74,7 @@ struct Score(u32);
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum AppState {
     MainMenu,
+    InitNewGame,
     InGame,
     Paused,
 }
@@ -90,12 +92,20 @@ fn main() {
         .add_plugin(EnemyPlugin)
         .add_plugin(ScorePlugin)
         .add_plugin(MainMenuPlugin)
+        .add_plugin(PauseMenuPlugin)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame)
                 .with_system(movable_system)
                 .with_system(player_laser_hit_enemy_system)
                 .with_system(pause_keyboard_event_system),
+        )
+        .add_system_set(
+            SystemSet::on_update(AppState::Paused).with_system(continue_keyboard_event_system),
+        )
+        .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(despawn_system))
+        .add_system_set(
+            SystemSet::on_enter(AppState::InitNewGame).with_system(new_game_init_system),
         )
         .run();
 }
@@ -222,7 +232,39 @@ fn player_laser_hit_enemy_system(
 }
 
 fn pause_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
-    if kb.pressed(KeyCode::Escape) {
-        app_state.set(AppState::MainMenu).unwrap();
+    if kb.pressed(KeyCode::Escape) || kb.pressed(KeyCode::P) {
+        app_state.set(AppState::Paused).unwrap();
     }
+}
+
+fn continue_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
+    if kb.pressed(KeyCode::Space) {
+        app_state.set(AppState::InGame).unwrap();
+    }
+}
+
+fn despawn_system(
+    mut commands: Commands,
+    enemy_query: Query<Entity, With<Enemy>>,
+    laser_query: Query<Entity, With<Laser>>,
+) {
+    for enemy_entity in enemy_query.iter() {
+        commands.entity(enemy_entity).despawn();
+    }
+    for laser_entity in laser_query.iter() {
+        commands.entity(laser_entity).despawn();
+    }
+}
+
+fn new_game_init_system(
+    mut wave: ResMut<Wave>,
+    mut enemy_count: ResMut<EnemyCount>,
+    mut score: ResMut<Score>,
+    mut app_state: ResMut<State<AppState>>,
+) {
+    wave.0 = 1;
+    enemy_count.0 = 0;
+    score.0 = 0;
+
+    app_state.set(AppState::InGame);
 }

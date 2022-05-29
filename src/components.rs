@@ -46,3 +46,12 @@ pub struct NewGameButton;
 
 #[derive(Component)]
 pub struct MainMenu;
+
+#[derive(Component)]
+pub struct PauseMenu;
+
+#[derive(Component)]
+pub struct ContinueButton;
+
+#[derive(Component)]
+pub struct MainMenuButton;
