@@ -1,7 +1,7 @@
 use crate::components::Enemy;
 use crate::{
-    EnemyCount, GameTextures, Movable, Rotated, SpriteSize, Velocity, Wave, WindowSize, ENEMY_SIZE,
-    ENEMY_SPRITE, SPRITE_SCALE, TIME_STEP,
+    AppState, EnemyCount, GameTextures, Movable, Rotated, SpriteSize, Velocity, Wave, WindowSize,
+    ENEMY_SIZE, ENEMY_SPRITE, SPRITE_SCALE, TIME_STEP,
 };
 use bevy::prelude::*;
 use rand::{thread_rng, Rng};
@@ -10,8 +10,11 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(enemy_spawn_system)
-            .add_system(enemy_movement_system);
+        app.add_system_set(
+            SystemSet::on_update(AppState::InGame)
+                .with_system(enemy_spawn_system)
+                .with_system(enemy_movement_system),
+        );
     }
 }
 

@@ -69,6 +69,14 @@ struct Rotated(bool);
 
 struct Score(u32);
 
+// States
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+enum AppState {
+    MainMenu,
+    InGame,
+    Paused,
+}
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
@@ -76,15 +84,19 @@ fn main() {
             title: "shooter game".to_string(),
             ..default()
         })
+        .add_state(AppState::MainMenu)
         .add_plugins(DefaultPlugins)
         .add_plugin(PlayerPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(ScorePlugin)
         .add_plugin(MainMenuPlugin)
         .add_startup_system(setup_system)
-        .add_system(movable_system)
-        .add_system(player_laser_hit_enemy_system)
-        .add_system(score_update_system)
+        .add_system_set(
+            SystemSet::on_update(AppState::InGame)
+                .with_system(movable_system)
+                .with_system(player_laser_hit_enemy_system)
+                .with_system(pause_keyboard_event_system),
+        )
         .run();
 }
 
@@ -124,12 +136,6 @@ fn setup_system(
     commands.insert_resource(EnemyCount(0));
     commands.insert_resource(Rotated(false));
     commands.insert_resource(Score(0));
-}
-
-fn score_update_system(mut query: Query<&mut Text, With<ScoreText>>, score: Res<Score>) {
-    if let Ok(mut text) = query.get_single_mut() {
-        text.sections[0].value = score.0.to_string();
-    }
 }
 
 fn movable_system(
@@ -212,5 +218,11 @@ fn player_laser_hit_enemy_system(
                 despawned_entities.insert(laser_entity);
             }
         }
+    }
+}
+
+fn pause_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
+    if kb.pressed(KeyCode::Escape) {
+        app_state.set(AppState::MainMenu).unwrap();
     }
 }

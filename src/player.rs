@@ -1,7 +1,7 @@
 use crate::components::{FromPlayer, Movable, Player, SpriteSize, Velocity};
 use crate::{
-    GameTextures, Laser, WindowSize, BASE_SPEED, PLAYER_LASER_SIZE, PLAYER_SIZE, SPRITE_SCALE,
-    TIME_STEP,
+    AppState, GameTextures, Laser, WindowSize, BASE_SPEED, PLAYER_LASER_SIZE, PLAYER_SIZE,
+    SPRITE_SCALE, TIME_STEP,
 };
 use bevy::prelude::*;
 
@@ -10,8 +10,11 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
-            .add_system(player_fire_system)
-            .add_system(player_keyboard_event_system);
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
+                    .with_system(player_fire_system)
+                    .with_system(player_keyboard_event_system),
+            );
     }
 }
 

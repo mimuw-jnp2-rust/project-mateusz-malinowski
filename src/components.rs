@@ -37,3 +37,12 @@ pub struct FromEnemy;
 
 #[derive(Component)]
 pub struct ScoreText;
+
+#[derive(Component)]
+pub struct ExitButton;
+
+#[derive(Component)]
+pub struct NewGameButton;
+
+#[derive(Component)]
+pub struct MainMenu;
