@@ -3,6 +3,7 @@
 mod components;
 mod enemy;
 mod player;
+mod save;
 mod ui;
 
 use bevy::math::Vec3Swizzles;
@@ -15,6 +16,7 @@ use crate::components::{
 };
 use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
+use crate::save::SavePlugin;
 use crate::ui::main_menu::MainMenuPlugin;
 use crate::ui::pause_menu::PauseMenuPlugin;
 use crate::ui::score::ScorePlugin;
@@ -79,6 +81,8 @@ enum AppState {
     InitNewGame,
     InGame,
     Paused,
+    Save,
+    Load,
 }
 
 fn main() {
@@ -95,6 +99,7 @@ fn main() {
         .add_plugin(ScorePlugin)
         .add_plugin(MainMenuPlugin)
         .add_plugin(PauseMenuPlugin)
+        .add_plugin(SavePlugin)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame)

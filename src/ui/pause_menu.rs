@@ -1,4 +1,6 @@
-use crate::components::{ContinueButton, ExitButton, MainMenuButton, NewGameButton, PauseMenu};
+use crate::components::{
+    ContinueButton, ExitButton, MainMenuButton, NewGameButton, PauseMenu, SaveButton,
+};
 use crate::ui::buttons::{hide, make_button, make_text, show, ButtonsPlugin};
 use crate::{AppState, Fonts};
 use bevy::app::AppExit;
@@ -13,6 +15,7 @@ impl Plugin for PauseMenuPlugin {
             .add_system_set(
                 SystemSet::on_update(AppState::Paused)
                     .with_system(continue_button_system)
+                    .with_system(save_button_system)
                     .with_system(main_menu_button_system),
             )
             .add_system_set(SystemSet::on_enter(AppState::Paused).with_system(show::<PauseMenu>))
@@ -27,6 +30,17 @@ fn continue_button_system(
     for (interaction) in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::InGame).unwrap();
+        }
+    }
+}
+
+fn save_button_system(
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<SaveButton>)>,
+    mut app_state: ResMut<State<AppState>>,
+) {
+    for (interaction) in interaction_query.iter() {
+        if let Interaction::Clicked = *interaction {
+            app_state.set(AppState::Save).unwrap();
         }
     }
 }
@@ -78,9 +92,12 @@ fn button_display_system(
                         })
                         .insert(ContinueButton);
 
-                    parent.spawn_bundle(make_button()).with_children(|parent| {
-                        parent.spawn_bundle(make_text("save game", &fonts));
-                    });
+                    parent
+                        .spawn_bundle(make_button())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(make_text("save game", &fonts));
+                        })
+                        .insert(SaveButton);
 
                     parent
                         .spawn_bundle(make_button())
