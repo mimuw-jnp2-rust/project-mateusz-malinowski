@@ -14,40 +14,28 @@ fn score_display_system(
     mut commands: Commands,
     fonts: Res<Fonts>,
 ) {
-    // Points counter
     commands
-        .spawn_bundle(NodeBundle {
+        .spawn_bundle(TextBundle {
             style: Style {
-                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                justify_content: JustifyContent::SpaceBetween,
-                ..default()
-            },
-            color: Color::NONE.into(),
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                style: Style {
-                    align_self: AlignSelf::FlexEnd,
-                    position_type: PositionType::Absolute,
-                    position: Rect {
-                        top: Val::Px(15.0),
-                        right: Val::Px(15.0),
-                        ..default()
-                    },
-                    margin: Rect::all(Val::Px(5.0)),
+                align_self: AlignSelf::FlexEnd,
+                position_type: PositionType::Absolute,
+                position: Rect {
+                    top: Val::Px(15.0),
+                    right: Val::Px(15.0),
                     ..default()
                 },
-                text: Text::with_section(
-                    "0",
-                    TextStyle {
-                        font: fonts.score.clone(),
-                        font_size: 40.0,
-                        color: Color::WHITE,
-                    }, Default::default()
-                ),
+                margin: Rect::all(Val::Px(5.0)),
                 ..default()
-            })
-                .insert(ScoreText);
-        });
+            },
+            text: Text::with_section(
+                "0",
+                TextStyle {
+                    font: fonts.score.clone(),
+                    font_size: 40.0,
+                    color: Color::WHITE,
+                }, Default::default()
+            ),
+            ..default()
+        })
+        .insert(ScoreText);
 }

@@ -13,6 +13,7 @@ use bevy::math::Vec3Swizzles;
 use crate::components::{Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity};
 use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
+use crate::ui::main_menu::MainMenuPlugin;
 use crate::ui::score::ScorePlugin;
 
 // Asset Constants
@@ -77,6 +78,7 @@ fn main() {
         .add_plugin(PlayerPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(ScorePlugin)
+        .add_plugin(MainMenuPlugin)
         .add_startup_system(setup_system)
         .add_system(movable_system)
         .add_system(player_laser_hit_enemy_system)
