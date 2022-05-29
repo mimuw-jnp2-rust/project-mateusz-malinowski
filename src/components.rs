@@ -58,3 +58,6 @@ pub struct MainMenuButton;
 
 #[derive(Component)]
 pub struct SaveButton;
+
+#[derive(Component)]
+pub struct LoadButton;

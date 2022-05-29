@@ -16,12 +16,11 @@ impl Plugin for SavePlugin {
 
 fn save_system(
     mut wave: ResMut<Wave>,
-    mut enemy_count: ResMut<EnemyCount>,
     mut score: ResMut<Score>,
     mut lives: ResMut<Lives>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    let text = format!("{}\n{}\n{}\n{}\n", wave.0, enemy_count.0, score.0, lives.0);
+    let text = format!("{}\n{}\n{}\n", wave.0, score.0, lives.0);
 
     if !Path::new("saves").exists() {
         match fs::create_dir("saves") {
@@ -30,7 +29,7 @@ fn save_system(
                 eprintln!("{}", err);
 
                 // return to pause menu
-                app_state.set(AppState::Paused);
+                app_state.set(AppState::Paused).unwrap();
                 return;
             }
         }
@@ -47,5 +46,5 @@ fn save_system(
         }
     }
 
-    app_state.set(AppState::Paused);
+    app_state.set(AppState::Paused).unwrap();
 }

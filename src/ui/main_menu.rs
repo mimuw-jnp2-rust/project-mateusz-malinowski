@@ -1,4 +1,4 @@
-use crate::components::{ExitButton, MainMenu, NewGameButton};
+use crate::components::{ExitButton, LoadButton, MainMenu, NewGameButton};
 use crate::ui::buttons::{hide, make_button, make_text, show, ButtonsPlugin};
 use crate::{AppState, Fonts};
 use bevy::app::AppExit;
@@ -13,6 +13,7 @@ impl Plugin for MainMenuPlugin {
             .add_system_set(
                 SystemSet::on_update(AppState::MainMenu)
                     .with_system(new_game_button_system)
+                    .with_system(load_button_system)
                     .with_system(exit_button_system),
             )
             .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(show::<MainMenu>))
@@ -27,6 +28,17 @@ fn new_game_button_system(
     for (interaction) in interaction_query.iter() {
         if let Interaction::Clicked = *interaction {
             app_state.set(AppState::InitNewGame).unwrap();
+        }
+    }
+}
+
+fn load_button_system(
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<LoadButton>)>,
+    mut app_state: ResMut<State<AppState>>,
+) {
+    for (interaction) in interaction_query.iter() {
+        if let Interaction::Clicked = *interaction {
+            app_state.set(AppState::Load).unwrap();
         }
     }
 }
@@ -77,9 +89,12 @@ fn button_display_system(
                         })
                         .insert(NewGameButton);
 
-                    parent.spawn_bundle(make_button()).with_children(|parent| {
-                        parent.spawn_bundle(make_text("load game", &fonts));
-                    });
+                    parent
+                        .spawn_bundle(make_button())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(make_text("load game", &fonts));
+                        })
+                        .insert(LoadButton);
 
                     parent
                         .spawn_bundle(make_button())

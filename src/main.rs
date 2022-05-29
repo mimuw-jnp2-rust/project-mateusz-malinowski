@@ -2,6 +2,7 @@
 
 mod components;
 mod enemy;
+mod load;
 mod player;
 mod save;
 mod ui;
@@ -15,6 +16,7 @@ use crate::components::{
     Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity,
 };
 use crate::enemy::EnemyPlugin;
+use crate::load::LoadPlugin;
 use crate::player::PlayerPlugin;
 use crate::save::SavePlugin;
 use crate::ui::main_menu::MainMenuPlugin;
@@ -100,6 +102,7 @@ fn main() {
         .add_plugin(MainMenuPlugin)
         .add_plugin(PauseMenuPlugin)
         .add_plugin(SavePlugin)
+        .add_plugin(LoadPlugin)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame)
@@ -270,7 +273,7 @@ fn enemy_laser_hit_player_system(
 
                 if lives.0 == 0 {
                     // return to main menu
-                    app_state.set(AppState::MainMenu);
+                    app_state.set(AppState::MainMenu).unwrap();
                 }
 
                 break;
@@ -316,5 +319,5 @@ fn new_game_init_system(
     score.0 = 0;
     lives.0 = 3;
 
-    app_state.set(AppState::InGame);
+    app_state.set(AppState::InGame).unwrap();
 }
