@@ -3,6 +3,7 @@
 mod components;
 mod player;
 mod enemy;
+mod ui;
 
 use std::collections::HashSet;
 use bevy::prelude::*;
@@ -12,6 +13,7 @@ use bevy::math::Vec3Swizzles;
 use crate::components::{Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity};
 use crate::enemy::EnemyPlugin;
 use crate::player::PlayerPlugin;
+use crate::ui::score::ScorePlugin;
 
 // Asset Constants
 const PLAYER_SPRITE: &str = "player_a_01.png";
@@ -33,6 +35,10 @@ const SPRITE_SCALE: f32 = 0.5;
 const TIME_STEP: f32 = 1. / 60.;
 const BASE_SPEED: f32 = 500.;
 
+// Font Constants
+const SCORE_FONT: &str = "fonts/LED Dot-Matrix.ttf";
+const BUTTON_FONT: &str = "fonts/Instruction.otf";
+
 // Resources
 pub struct WindowSize {
     pub w: f32,
@@ -45,6 +51,11 @@ struct GameTextures {
     enemy: Handle<Image>,
     enemy_laser: Handle<Image>,
     explosion: Handle<TextureAtlas>,
+}
+
+struct Fonts {
+    score: Handle<Font>,
+    button: Handle<Font>,
 }
 
 struct Wave(u32);
@@ -65,6 +76,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(PlayerPlugin)
         .add_plugin(EnemyPlugin)
+        .add_plugin(ScorePlugin)
         .add_startup_system(setup_system)
         .add_system(movable_system)
         .add_system(player_laser_hit_enemy_system)
@@ -102,47 +114,18 @@ fn setup_system(
         }
     );
 
+    // Fonts
+    commands.insert_resource(
+        Fonts {
+            score: asset_server.load(SCORE_FONT),
+            button: asset_server.load(BUTTON_FONT),
+        }
+    );
+
     commands.insert_resource(Wave(1));
     commands.insert_resource(EnemyCount(0));
     commands.insert_resource(Rotated(false));
     commands.insert_resource(Score(0));
-
-    // Points counter
-    commands
-        .spawn_bundle(NodeBundle {
-            style: Style {
-                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                justify_content: JustifyContent::SpaceBetween,
-                ..default()
-            },
-            color: Color::NONE.into(),
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                style: Style {
-                    align_self: AlignSelf::FlexEnd,
-                    position_type: PositionType::Absolute,
-                    position: Rect {
-                        top: Val::Px(15.0),
-                        right: Val::Px(15.0),
-                        ..default()
-                    },
-                    margin: Rect::all(Val::Px(5.0)),
-                    ..default()
-                },
-                text: Text::with_section(
-                    "0",
-                    TextStyle {
-                        font: asset_server.load("fonts/LED Dot-Matrix.ttf"),
-                        font_size: 40.0,
-                        color: Color::WHITE,
-                    }, Default::default()
-                ),
-                ..default()
-            })
-                .insert(ScoreText);
-        });
 }
 
 fn score_update_system(
