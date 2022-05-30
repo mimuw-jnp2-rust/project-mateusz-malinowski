@@ -23,14 +23,14 @@ nieskończona. Gra będzie się toczyć do utraty wszystkich żyć przez gracza.
 - Różne rodzaje broni
 
 ## Propozycja podziału na części
-Pierwszej część:
-- Poruszanie się
-- Strzelanie
-- Niszczenie przeciwników
-- Punktacja
-- Możliwość zapisywania i wczytywania stanu gry
+### Pierwsza część:
+- Poruszanie się ✅
+- Strzelanie ✅
+- Niszczenie przeciwników ✅
+- Punktacja ✅
+- Możliwość zapisywania i wczytywania stanu gry ✅
 
-Druga część:
+### Druga część:
 - Ulepszanie broni
 - Różne rodzaje broni
 - Ładne animacje
@@ -39,5 +39,29 @@ Druga część:
 - Dźwięki
 - Balans rozgrywki
 
+## Podsumowanie pierwszej części
+Tworząc grę, korzystałem z tego [tutorialu](https://www.youtube.com/watch?v=j7qHwb7geIM),
+[cheat booka](https://bevy-cheatbook.github.io/introduction.html) oraz przykładów
+[ui](https://bevyengine.org/examples/ui/ui/) i
+[state](https://github.com/bevyengine/bevy/blob/v0.7.0/examples/ecs/state.rs). Udało mi się zrealizować wszystkie
+zaplanowane na tę część zadania. Ogólnie rzecz biorąc, gra jest grywalna. Bardzo przyjemnie tworzy się gry w bevy.
+
+### Sterowanie
+- strzałki — poruszanie się
+- spacja — strzelanie lub odpazuowanie
+- escape lub p — pauza
+
+### Zapisywanie gry
+- można zapisać grę, ale ścieżka pliku jest zahadrkodowana, więc można mieć tylko jeden zapis (kolejny zapis nadpisuje
+poprzedni)
+- zapisywany jest numer fali, liczba żyć oraz liczba punktów w formacie tekstowym
+
+### Inne
+- przeciwnicy pojawiają się losowo, mają losową prędkość, poruszają się po trajektorii rombu
+- przeciwnicy strzelają losowo, średnio powinien być jeden strzał na sekundę na ekranie 
+- gracz może strzelać tak szybko, jak jest w stanie naciskać spację
+- gracz ma 3 życia, ale nie jest to nigdzie wyświetlane
+
 ## Biblioteki
 - Bevy
+- rand
