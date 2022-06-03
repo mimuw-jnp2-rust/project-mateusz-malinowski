@@ -37,6 +37,12 @@ nieskończona. Gra będzie się toczyć do utraty wszystkich żyć przez gracza.
   - niszczenie przeciwników
   - przewijające się tło
 - Dźwięki
+- Poprawienie organizacji kodu
+- Poprawienie poruszanie się przeciwników
+- Poprawienie saveów
+  - zapisywanie w trakcie fali
+  - możliwość wyboru savea
+  - quicksave
 - Balans rozgrywki
 
 ## Podsumowanie pierwszej części
