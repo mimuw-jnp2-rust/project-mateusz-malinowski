@@ -1,5 +1,5 @@
-use crate::components::{ContinueButton, MainMenuButton, PauseMenu, SaveButton};
 use crate::ui::buttons::{hide, make_button, make_text, show, ButtonsPlugin};
+use crate::ui::components::{ContinueButton, MainMenuButton, PauseMenu, SaveButton};
 use crate::{AppState, Fonts};
 use bevy::prelude::*;
 

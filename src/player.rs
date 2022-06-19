@@ -1,8 +1,12 @@
 use crate::components::{FromPlayer, Movable, Player, SpriteSize, Velocity};
-use crate::{
-    AppState, GameTextures, Laser, WindowSize, PLAYER_LASER_SIZE, PLAYER_SIZE, SPRITE_SCALE,
-};
+use crate::{AppState, GameTextures, Laser, WindowSize, SPRITE_SCALE};
 use bevy::prelude::*;
+
+// Asset Constants
+pub const PLAYER_SPRITE: &str = "player_a_01.png";
+const PLAYER_SIZE: (f32, f32) = (144., 75.);
+pub const PLAYER_LASER_SPRITE: &str = "laser_a_01.png";
+const PLAYER_LASER_SIZE: (f32, f32) = (9., 54.);
 
 pub struct PlayerPlugin;
 

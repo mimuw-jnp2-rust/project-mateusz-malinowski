@@ -1,12 +1,18 @@
 use crate::components::Enemy;
 use crate::{
     AppState, EnemyCount, FromEnemy, GameTextures, Laser, Movable, Rotated, SpriteSize, Velocity,
-    Wave, WindowSize, ENEMY_LASER_SIZE, ENEMY_SIZE, SPRITE_SCALE,
+    Wave, WindowSize, SPRITE_SCALE,
 };
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 use rand::{thread_rng, Rng};
 use std::f32::consts::PI;
+
+// Asset Constants
+pub const ENEMY_SPRITE: &str = "enemy_a_01.png";
+const ENEMY_SIZE: (f32, f32) = (144., 75.);
+pub const ENEMY_LASER_SPRITE: &str = "laser_b_01.png";
+const ENEMY_LASER_SIZE: (f32, f32) = (17., 55.);
 
 pub struct EnemyPlugin;
 

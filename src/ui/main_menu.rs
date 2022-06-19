@@ -1,5 +1,5 @@
-use crate::components::{ExitButton, LoadButton, MainMenu, NewGameButton};
 use crate::ui::buttons::{hide, make_button, make_text, show, ButtonsPlugin};
+use crate::ui::components::{ExitButton, LoadButton, MainMenu, NewGameButton};
 use crate::{AppState, Fonts};
 use bevy::app::AppExit;
 use bevy::prelude::*;

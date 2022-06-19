@@ -1,38 +1,29 @@
 #![allow(clippy::type_complexity)]
 
+mod collision;
 mod components;
 mod enemy;
 mod load;
+mod movement;
 mod player;
 mod save;
 mod ui;
 
-use bevy::math::Vec3Swizzles;
-use bevy::prelude::*;
-use bevy::sprite::collide_aabb::collide;
-use std::collections::HashSet;
-
+use crate::collision::CollisionPlugin;
 use crate::components::{
-    Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, ScoreText, SpriteSize, Velocity,
+    Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, SpriteSize, Velocity,
 };
 use crate::enemy::EnemyPlugin;
 use crate::load::LoadPlugin;
+use crate::movement::MovementPlugin;
 use crate::player::PlayerPlugin;
 use crate::save::SavePlugin;
 use crate::ui::main_menu::MainMenuPlugin;
 use crate::ui::pause_menu::PauseMenuPlugin;
 use crate::ui::score::ScorePlugin;
-
-// Asset Constants
-const PLAYER_SPRITE: &str = "player_a_01.png";
-const PLAYER_SIZE: (f32, f32) = (144., 75.);
-const PLAYER_LASER_SPRITE: &str = "laser_a_01.png";
-const PLAYER_LASER_SIZE: (f32, f32) = (9., 54.);
-
-const ENEMY_SPRITE: &str = "enemy_a_01.png";
-const ENEMY_SIZE: (f32, f32) = (144., 75.);
-const ENEMY_LASER_SPRITE: &str = "laser_b_01.png";
-const ENEMY_LASER_SIZE: (f32, f32) = (17., 55.);
+use bevy::prelude::*;
+use enemy::{ENEMY_LASER_SPRITE, ENEMY_SPRITE};
+use player::{PLAYER_LASER_SPRITE, PLAYER_SPRITE};
 
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 
@@ -41,10 +32,6 @@ const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const EXPLOSION_LEN: usize = 16;
 
 const SPRITE_SCALE: f32 = 0.5;
-
-// Game Constants
-const TIME_STEP: f32 = 1. / 60.;
-const BASE_SPEED: f32 = 500.;
 
 // Font Constants
 const SCORE_FONT: &str = "fonts/LED Dot-Matrix.ttf";
@@ -108,13 +95,11 @@ fn main() {
         .add_plugin(PauseMenuPlugin)
         .add_plugin(SavePlugin)
         .add_plugin(LoadPlugin)
+        .add_plugin(CollisionPlugin)
+        .add_plugin(MovementPlugin)
         .add_startup_system(setup_system)
         .add_system_set(
-            SystemSet::on_update(AppState::InGame)
-                .with_system(movable_system)
-                .with_system(player_laser_hit_enemy_system)
-                .with_system(enemy_laser_hit_player_system)
-                .with_system(pause_keyboard_event_system),
+            SystemSet::on_update(AppState::InGame).with_system(pause_keyboard_event_system),
         )
         .add_system_set(
             SystemSet::on_update(AppState::Paused).with_system(continue_keyboard_event_system),
@@ -165,128 +150,6 @@ fn setup_system(
     commands.insert_resource(Lives(3));
 }
 
-fn movable_system(
-    mut commands: Commands,
-    win_size: Res<WindowSize>,
-    mut query: Query<(Entity, &Velocity, &mut Transform, &Movable)>,
-) {
-    for (entity, velocity, mut transform, movable) in query.iter_mut() {
-        let translation = &mut transform.translation;
-        translation.x += velocity.x * TIME_STEP * BASE_SPEED;
-        translation.y += velocity.y * TIME_STEP * BASE_SPEED;
-
-        // despawn when out of screen
-        if movable.auto_despawn {
-            const MARGIN: f32 = 200.;
-
-            if translation.y > win_size.h / 2. + MARGIN
-                || translation.y < -win_size.h / 2. - MARGIN
-                || translation.x > win_size.w / 2. + MARGIN
-                || translation.x < -win_size.w / 2. - MARGIN
-            {
-                commands.entity(entity).despawn();
-            }
-        }
-    }
-}
-
-fn player_laser_hit_enemy_system(
-    mut commands: Commands,
-    laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromPlayer>)>,
-    enemy_query: Query<(Entity, &Transform, &SpriteSize), With<Enemy>>,
-    mut enemy_count: ResMut<EnemyCount>,
-    mut wave: ResMut<Wave>,
-    mut score: ResMut<Score>,
-) {
-    let mut despawned_entities: HashSet<Entity> = HashSet::new();
-
-    // iterate through the lasers
-    for (laser_entity, laser_tf, laser_size) in laser_query.iter() {
-        if despawned_entities.contains(&laser_entity) {
-            continue;
-        }
-
-        let laser_scale = laser_tf.scale.xy();
-
-        // iterate through the enemies
-        for (enemy_entity, enemy_tf, enemy_size) in enemy_query.iter() {
-            if despawned_entities.contains(&enemy_entity)
-                || despawned_entities.contains(&laser_entity)
-            {
-                continue;
-            }
-
-            let enemy_scale = enemy_tf.scale.xy();
-
-            // determine if collision
-            let collision = collide(
-                laser_tf.translation,
-                laser_size.0 * laser_scale,
-                enemy_tf.translation,
-                enemy_size.0 * enemy_scale,
-            );
-
-            // perform collision
-            if collision.is_some() {
-                // remove the enemy
-                commands.entity(enemy_entity).despawn();
-                despawned_entities.insert(enemy_entity);
-                enemy_count.0 -= 1;
-
-                score.0 += 100;
-
-                // start next wave
-                if enemy_count.0 == 0 {
-                    wave.0 += 1;
-                }
-
-                // remove the laser
-                commands.entity(laser_entity).despawn();
-                despawned_entities.insert(laser_entity);
-            }
-        }
-    }
-}
-
-fn enemy_laser_hit_player_system(
-    mut commands: Commands,
-    mut lives: ResMut<Lives>,
-    laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromEnemy>)>,
-    player_query: Query<(&Transform, &SpriteSize), With<Player>>,
-    mut app_state: ResMut<State<AppState>>,
-) {
-    if let Ok((player_tf, player_size)) = player_query.get_single() {
-        let player_scale = player_tf.scale.xy();
-
-        for (laser_entity, laser_tf, laser_size) in laser_query.iter() {
-            let laser_scale = laser_tf.scale.xy();
-
-            // determine if collision
-            let collision = collide(
-                laser_tf.translation,
-                laser_size.0 * laser_scale,
-                player_tf.translation,
-                player_size.0 * player_scale,
-            );
-
-            // perform the collision
-            if collision.is_some() {
-                // remove the laser
-                commands.entity(laser_entity).despawn();
-
-                lives.0 -= 1;
-
-                if lives.0 == 0 {
-                    // return to main menu
-                    app_state.set(AppState::MainMenu).unwrap();
-                }
-
-                break;
-            }
-        }
-    }
-}
-
 fn pause_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
     if kb.pressed(KeyCode::Escape) || kb.pressed(KeyCode::P) {
         app_state.set(AppState::Paused).unwrap();
@@ -299,6 +162,7 @@ fn continue_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut
     }
 }
 
+// Despawns game entities when entering to main menu.
 fn despawn_system(
     mut commands: Commands,
     enemy_query: Query<Entity, With<Enemy>>,

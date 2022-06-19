@@ -1,5 +1,6 @@
 use crate::ui::buttons::{hide, show};
-use crate::{AppState, Fonts, Score, ScoreText};
+use crate::ui::components::ScoreText;
+use crate::{AppState, Fonts, Score};
 use bevy::prelude::*;
 
 pub struct ScorePlugin;
