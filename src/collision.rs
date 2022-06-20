@@ -1,6 +1,7 @@
+use crate::components::{Explosion, ExplosionTimer};
 use crate::{
-    AppState, Enemy, EnemyCount, FromEnemy, FromPlayer, Laser, Lives, Player, Score, SpriteSize,
-    Wave,
+    AppState, Enemy, EnemyCount, FromEnemy, FromPlayer, GameTextures, Laser, Lives, Player, Score,
+    SpriteSize, Wave,
 };
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
@@ -26,6 +27,7 @@ fn player_laser_hit_enemy_system(
     mut enemy_count: ResMut<EnemyCount>,
     mut wave: ResMut<Wave>,
     mut score: ResMut<Score>,
+    game_textures: Res<GameTextures>,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
 
@@ -72,6 +74,19 @@ fn player_laser_hit_enemy_system(
                 // remove the laser
                 commands.entity(laser_entity).despawn();
                 despawned_entities.insert(laser_entity);
+
+                // spawn the Explosion
+                commands
+                    .spawn_bundle(SpriteSheetBundle {
+                        texture_atlas: game_textures.explosion.clone(),
+                        transform: Transform {
+                            translation: enemy_tf.translation,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    })
+                    .insert(Explosion)
+                    .insert(ExplosionTimer::default());
             }
         }
     }

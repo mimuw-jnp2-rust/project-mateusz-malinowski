@@ -1,4 +1,4 @@
-use bevy::prelude::{Component, Vec2};
+use bevy::prelude::{Component, Timer, Vec2};
 
 #[derive(Component)]
 pub struct Velocity {
@@ -34,3 +34,15 @@ pub struct Enemy;
 
 #[derive(Component)]
 pub struct FromEnemy;
+
+#[derive(Component)]
+pub struct Explosion;
+
+#[derive(Component)]
+pub struct ExplosionTimer(pub Timer);
+
+impl Default for ExplosionTimer {
+    fn default() -> Self {
+        Self(Timer::from_seconds(0.05, true))
+    }
+}

@@ -3,6 +3,7 @@
 mod collision;
 mod components;
 mod enemy;
+mod explosion;
 mod load;
 mod movement;
 mod player;
@@ -14,6 +15,7 @@ use crate::components::{
     Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, SpriteSize, Velocity,
 };
 use crate::enemy::EnemyPlugin;
+use crate::explosion::ExplosionPlugin;
 use crate::load::LoadPlugin;
 use crate::movement::MovementPlugin;
 use crate::player::PlayerPlugin;
@@ -23,13 +25,8 @@ use crate::ui::pause_menu::PauseMenuPlugin;
 use crate::ui::score::ScorePlugin;
 use bevy::prelude::*;
 use enemy::{ENEMY_LASER_SPRITE, ENEMY_SPRITE};
+use explosion::EXPLOSION_SHEET;
 use player::{PLAYER_LASER_SPRITE, PLAYER_SPRITE};
-
-const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
-
-// this will be used later
-#[allow(dead_code)]
-const EXPLOSION_LEN: usize = 16;
 
 const SPRITE_SCALE: f32 = 0.5;
 
@@ -43,8 +40,6 @@ pub struct WindowSize {
     pub h: f32,
 }
 
-// field explosion will be used later
-#[allow(dead_code)]
 struct GameTextures {
     player: Handle<Image>,
     player_laser: Handle<Image>,
@@ -97,6 +92,7 @@ fn main() {
         .add_plugin(LoadPlugin)
         .add_plugin(CollisionPlugin)
         .add_plugin(MovementPlugin)
+        .add_plugin(ExplosionPlugin)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame).with_system(pause_keyboard_event_system),
@@ -114,6 +110,7 @@ fn main() {
 fn setup_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut windows: ResMut<Windows>,
 ) {
     // Cameras
@@ -128,13 +125,18 @@ fn setup_system(
         h: window.height(),
     });
 
+    // create explosion texture atlas
+    let texture_handle = asset_server.load(EXPLOSION_SHEET);
+    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(64., 64.), 4, 4);
+    let explosion = texture_atlases.add(texture_atlas);
+
     // Game Textures
     commands.insert_resource(GameTextures {
         player: asset_server.load(PLAYER_SPRITE),
         player_laser: asset_server.load(PLAYER_LASER_SPRITE),
         enemy: asset_server.load(ENEMY_SPRITE),
         enemy_laser: asset_server.load(ENEMY_LASER_SPRITE),
-        explosion: asset_server.load(EXPLOSION_SHEET),
+        explosion,
     });
 
     // Fonts
