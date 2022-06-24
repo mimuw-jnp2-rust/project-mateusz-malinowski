@@ -1,3 +1,4 @@
+#![feature(adt_const_params)]
 #![allow(clippy::type_complexity)]
 
 mod collision;
@@ -9,6 +10,7 @@ mod movement;
 mod player;
 mod save;
 mod ui;
+mod weapons;
 
 use crate::collision::CollisionPlugin;
 use crate::components::{
@@ -18,15 +20,18 @@ use crate::enemy::EnemyPlugin;
 use crate::explosion::ExplosionPlugin;
 use crate::load::LoadPlugin;
 use crate::movement::MovementPlugin;
-use crate::player::PlayerPlugin;
+use crate::player::{PlayerPlugin, PlayerState};
 use crate::save::SavePlugin;
 use crate::ui::main_menu::MainMenuPlugin;
 use crate::ui::pause_menu::PauseMenuPlugin;
 use crate::ui::score::ScorePlugin;
+use crate::weapons::lasergun::LASERGUN_SPRITE;
+use crate::weapons::shotgun::SHOTGUN_SPRITE;
+use crate::weapons::WeaponPlugins;
 use bevy::prelude::*;
 use enemy::{ENEMY_LASER_SPRITE, ENEMY_SPRITE};
 use explosion::EXPLOSION_SHEET;
-use player::{PLAYER_LASER_SPRITE, PLAYER_SPRITE};
+use player::PLAYER_SPRITE;
 
 const SPRITE_SCALE: f32 = 0.5;
 
@@ -42,9 +47,10 @@ pub struct WindowSize {
 
 struct GameTextures {
     player: Handle<Image>,
-    player_laser: Handle<Image>,
+    lasergun_bullet: Handle<Image>,
+    shotgun_bullet: Handle<Image>,
     enemy: Handle<Image>,
-    enemy_laser: Handle<Image>,
+    enemy_bullet: Handle<Image>,
     explosion: Handle<TextureAtlas>,
 }
 
@@ -60,8 +66,6 @@ struct EnemyCount(u32);
 struct Rotated(bool);
 
 struct Score(u32);
-
-struct Lives(u32);
 
 // States
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -93,6 +97,7 @@ fn main() {
         .add_plugin(CollisionPlugin)
         .add_plugin(MovementPlugin)
         .add_plugin(ExplosionPlugin)
+        .add_plugins(WeaponPlugins)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame).with_system(pause_keyboard_event_system),
@@ -133,9 +138,10 @@ fn setup_system(
     // Game Textures
     commands.insert_resource(GameTextures {
         player: asset_server.load(PLAYER_SPRITE),
-        player_laser: asset_server.load(PLAYER_LASER_SPRITE),
+        lasergun_bullet: asset_server.load(LASERGUN_SPRITE),
+        shotgun_bullet: asset_server.load(SHOTGUN_SPRITE),
         enemy: asset_server.load(ENEMY_SPRITE),
-        enemy_laser: asset_server.load(ENEMY_LASER_SPRITE),
+        enemy_bullet: asset_server.load(ENEMY_LASER_SPRITE),
         explosion,
     });
 
@@ -149,7 +155,7 @@ fn setup_system(
     commands.insert_resource(EnemyCount(0));
     commands.insert_resource(Rotated(false));
     commands.insert_resource(Score(0));
-    commands.insert_resource(Lives(3));
+    commands.insert_resource(PlayerState::new());
 }
 
 fn pause_keyboard_event_system(kb: Res<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
@@ -182,13 +188,13 @@ fn new_game_init_system(
     mut wave: ResMut<Wave>,
     mut enemy_count: ResMut<EnemyCount>,
     mut score: ResMut<Score>,
-    mut lives: ResMut<Lives>,
+    mut player_state: ResMut<PlayerState>,
     mut app_state: ResMut<State<AppState>>,
 ) {
     wave.0 = 1;
     enemy_count.0 = 0;
     score.0 = 0;
-    lives.0 = 3;
+    player_state.reset();
 
     app_state.set(AppState::InGame).unwrap();
 }

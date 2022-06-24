@@ -1,4 +1,4 @@
-use crate::{AppState, Lives, Score, Wave};
+use crate::{AppState, PlayerState, Score, Wave};
 use bevy::prelude::*;
 use std::fs;
 use std::fs::File;
@@ -16,10 +16,10 @@ impl Plugin for SavePlugin {
 fn save_system(
     wave: ResMut<Wave>,
     score: ResMut<Score>,
-    lives: ResMut<Lives>,
+    player_state: ResMut<PlayerState>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    let text = format!("{}\n{}\n{}\n", wave.0, score.0, lives.0);
+    let text = format!("{}\n{}\n{}\n", wave.0, score.0, player_state.lives);
 
     if !Path::new("saves").exists() {
         match fs::create_dir("saves") {

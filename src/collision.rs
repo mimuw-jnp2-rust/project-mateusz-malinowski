@@ -1,7 +1,8 @@
 use crate::components::{Explosion, ExplosionTimer};
+use crate::weapons::WeaponType;
 use crate::{
-    AppState, Enemy, EnemyCount, FromEnemy, FromPlayer, GameTextures, Laser, Lives, Player, Score,
-    SpriteSize, Wave,
+    AppState, Enemy, EnemyCount, FromEnemy, FromPlayer, GameTextures, Laser, Player, PlayerState,
+    Score, SpriteSize, Wave,
 };
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
@@ -28,6 +29,7 @@ fn player_laser_hit_enemy_system(
     mut wave: ResMut<Wave>,
     mut score: ResMut<Score>,
     game_textures: Res<GameTextures>,
+    mut player_state: ResMut<PlayerState>,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
 
@@ -69,6 +71,11 @@ fn player_laser_hit_enemy_system(
                 // start next wave
                 if enemy_count.0 == 0 {
                     wave.0 += 1;
+                    player_state.weapon_lvl += 1;
+                    match player_state.weapon_type {
+                        WeaponType::Lasergun => player_state.weapon_type = WeaponType::Shotgun,
+                        WeaponType::Shotgun => player_state.weapon_type = WeaponType::Lasergun,
+                    }
                 }
 
                 // remove the laser
@@ -94,7 +101,7 @@ fn player_laser_hit_enemy_system(
 
 fn enemy_laser_hit_player_system(
     mut commands: Commands,
-    mut lives: ResMut<Lives>,
+    mut player_state: ResMut<PlayerState>,
     laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromEnemy>)>,
     player_query: Query<(&Transform, &SpriteSize), With<Player>>,
     mut app_state: ResMut<State<AppState>>,
@@ -118,9 +125,9 @@ fn enemy_laser_hit_player_system(
                 // remove the laser
                 commands.entity(laser_entity).despawn();
 
-                lives.0 -= 1;
+                player_state.lives -= 1;
 
-                if lives.0 == 0 {
+                if player_state.lives == 0 {
                     // return to main menu
                     app_state.set(AppState::MainMenu).unwrap();
                 }

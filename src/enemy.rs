@@ -124,7 +124,7 @@ fn enemy_fire_system(
         // spawn enemy laser sprite
         commands
             .spawn_bundle(SpriteBundle {
-                texture: game_textures.enemy_laser.clone(),
+                texture: game_textures.enemy_bullet.clone(),
                 transform: Transform {
                     translation: Vec3::new(x, y - 15., 0.),
                     rotation: Quat::from_rotation_x(PI),
