@@ -1,4 +1,5 @@
-use bevy::prelude::{Component, Timer, Vec2};
+use crate::powerups::PowerUpType;
+use bevy::prelude::{Component, Timer, Vec2, Vec3};
 
 #[derive(Component)]
 pub struct Velocity {
@@ -45,4 +46,13 @@ impl Default for ExplosionTimer {
     fn default() -> Self {
         Self(Timer::from_seconds(0.05, true))
     }
+}
+
+#[derive(Component)]
+pub struct PowerUp(pub PowerUpType);
+
+#[derive(Component)]
+pub struct SpawnPowerUp {
+    pub translation: Vec3,
+    pub type_: PowerUpType,
 }

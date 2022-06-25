@@ -1,5 +1,6 @@
-#![feature(adt_const_params)]
 #![allow(clippy::type_complexity)]
+#![allow(incomplete_features)]
+#![feature(adt_const_params)]
 
 mod collision;
 mod components;
@@ -8,6 +9,7 @@ mod explosion;
 mod load;
 mod movement;
 mod player;
+mod powerups;
 mod save;
 mod ui;
 mod weapons;
@@ -21,6 +23,7 @@ use crate::explosion::ExplosionPlugin;
 use crate::load::LoadPlugin;
 use crate::movement::MovementPlugin;
 use crate::player::{PlayerPlugin, PlayerState};
+use crate::powerups::PowerUpsPlugin;
 use crate::save::SavePlugin;
 use crate::ui::main_menu::MainMenuPlugin;
 use crate::ui::pause_menu::PauseMenuPlugin;
@@ -98,6 +101,7 @@ fn main() {
         .add_plugin(MovementPlugin)
         .add_plugin(ExplosionPlugin)
         .add_plugins(WeaponPlugins)
+        .add_plugin(PowerUpsPlugin)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame).with_system(pause_keyboard_event_system),
