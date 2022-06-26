@@ -56,3 +56,6 @@ pub struct SpawnPowerUp {
     pub translation: Vec3,
     pub type_: PowerUpType,
 }
+
+#[derive(Component)]
+pub struct BackgroundTop;

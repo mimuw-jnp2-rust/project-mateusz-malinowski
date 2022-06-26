@@ -38,7 +38,7 @@ fn fire_system(
                     .spawn_bundle(SpriteBundle {
                         texture: game_textures.shotgun_bullet.clone(),
                         transform: Transform {
-                            translation: Vec3::new(x, y + 15., 0.),
+                            translation: Vec3::new(x, y + 15., 5.),
                             scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
                             rotation: Quat::from_rotation_z(-angle),
                         },

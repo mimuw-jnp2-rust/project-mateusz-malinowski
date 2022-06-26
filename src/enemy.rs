@@ -126,7 +126,7 @@ fn enemy_fire_system(
             .spawn_bundle(SpriteBundle {
                 texture: game_textures.enemy_bullet.clone(),
                 transform: Transform {
-                    translation: Vec3::new(x, y - 15., 0.),
+                    translation: Vec3::new(x, y - 15., 5.),
                     rotation: Quat::from_rotation_x(PI),
                     scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
                 },

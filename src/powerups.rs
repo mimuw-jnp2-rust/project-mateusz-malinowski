@@ -73,7 +73,6 @@ fn power_up_spawn_system(
                 },
                 transform: Transform {
                     translation: power_up_to_spawn.translation,
-                    // scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
                     ..Default::default()
                 },
                 ..Default::default()

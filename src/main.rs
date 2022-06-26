@@ -2,6 +2,7 @@
 #![allow(incomplete_features)]
 #![feature(adt_const_params)]
 
+mod background;
 mod collision;
 mod components;
 mod enemy;
@@ -14,6 +15,7 @@ mod save;
 mod ui;
 mod weapons;
 
+use crate::background::{BackgroundPlugin, BACKGROUND_SPRITE};
 use crate::collision::CollisionPlugin;
 use crate::components::{
     Enemy, FromEnemy, FromPlayer, Laser, Movable, Player, SpriteSize, Velocity,
@@ -54,6 +56,7 @@ struct GameTextures {
     shotgun_bullet: Handle<Image>,
     enemy: Handle<Image>,
     enemy_bullet: Handle<Image>,
+    background: Handle<Image>,
     explosion: Handle<TextureAtlas>,
 }
 
@@ -102,6 +105,7 @@ fn main() {
         .add_plugin(ExplosionPlugin)
         .add_plugins(WeaponPlugins)
         .add_plugin(PowerUpsPlugin)
+        .add_plugin(BackgroundPlugin)
         .add_startup_system(setup_system)
         .add_system_set(
             SystemSet::on_update(AppState::InGame).with_system(pause_keyboard_event_system),
@@ -121,6 +125,7 @@ fn setup_system(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut windows: ResMut<Windows>,
+    // mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     // Cameras
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
@@ -134,6 +139,30 @@ fn setup_system(
         h: window.height(),
     });
 
+    // let background_image: Handle<Image> = ;
+    // commands
+    //     .spawn_bundle(SpriteBundle {
+    //         // material: materials.add(background_image.into()),
+    //         texture: background_image.clone(),
+    //         ..default()
+    //     });
+    // commands
+    //     .spawn_bundle(NodeBundle {
+    //     style: Style {
+    //         size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+    //         // align_items: AlignItems::Center,
+    //         // justify_content: JustifyContent::Center,
+    //         ..default()
+    //     },
+    //     image: background_image.clone().into(),
+    //     transform: Transform {
+    //         translation: Vec3::new(0., 0., -1.),
+    //         // scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
+    //         ..default()
+    //     },
+    //     ..default()
+    // });
+
     // create explosion texture atlas
     let texture_handle = asset_server.load(EXPLOSION_SHEET);
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(64., 64.), 4, 4);
@@ -146,6 +175,7 @@ fn setup_system(
         shotgun_bullet: asset_server.load(SHOTGUN_SPRITE),
         enemy: asset_server.load(ENEMY_SPRITE),
         enemy_bullet: asset_server.load(ENEMY_LASER_SPRITE),
+        background: asset_server.load(BACKGROUND_SPRITE),
         explosion,
     });
 
