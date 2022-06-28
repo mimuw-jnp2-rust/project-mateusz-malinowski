@@ -31,19 +31,19 @@ nieskończona. Gra będzie się toczyć do utraty wszystkich żyć przez gracza.
 - Możliwość zapisywania i wczytywania stanu gry ✅
 
 ### Druga część:
-- Ulepszanie broni
-- Różne rodzaje broni
-- Ładne animacje
-  - niszczenie przeciwników
-  - przewijające się tło
-- Dźwięki
-- Poprawienie organizacji kodu
-- Poprawienie poruszanie się przeciwników
-- Poprawienie saveów
-  - zapisywanie w trakcie fali
-  - możliwość wyboru savea
-  - quicksave
-- Balans rozgrywki
+- Ulepszanie broni ✅
+- Różne rodzaje broni ✅
+- Ładne animacje ✅
+  - niszczenie przeciwników ✅
+  - przewijające się tło ✅
+- Dźwięki ❌
+- Poprawienie organizacji kodu ✅
+- Poprawienie poruszanie się przeciwników ❌
+- Poprawienie saveów ❌
+  - zapisywanie w trakcie fali ❌
+  - możliwość wyboru savea ❌
+  - quicksave ❌
+- Balans rozgrywki ✅/❌
 
 ## Podsumowanie pierwszej części
 Tworząc grę, korzystałem z tego [tutorialu](https://www.youtube.com/watch?v=j7qHwb7geIM),
@@ -67,6 +67,18 @@ poprzedni)
 - przeciwnicy strzelają losowo, średnio powinien być jeden strzał na sekundę na ekranie 
 - gracz może strzelać tak szybko, jak jest w stanie naciskać spację
 - gracz ma 3 życia, ale nie jest to nigdzie wyświetlane
+
+## Podsumowanie drugiej części
+Została dodana nowa broń — shotgun. Bronie można ulepszać, każde ulepszenie zwiększa liczbę wystrzeliwanych
+pocisków o 1. Została dodana możliwość zbierania ulepszeń. Zostały dodane animacje niszczenia przeciwników
+i przewijanie tła. Pozostałe zaplanowane rzeczy nie zostały zrealizowane, ponieważ postanowiłem skupić się
+na nauce do sesji.
+
+### Ulepszenia
+- ![hp](/assets/hp.png) - zwiększa ilość żyć o 1
+- ![power_up](/assets/power_up.png) - zwiększa poziom broni o 1
+- ![blue_weapon](/assets/blue_weapon.png) - zmienia broń na lasery
+- ![green_weapon](/assets/green_weapon.png) - zmienia broń na shotgun
 
 ## Biblioteki
 - Bevy
